@@ -12,6 +12,8 @@
 
 #import "RCTARKitDelegate.h"
 #import "RCTARKitNodes.h"
+#import "RCTMultiPeer.h"
+@import CoreLocation;
 
 typedef void (^RCTBubblingEventBlock)(NSDictionary *body);
 typedef void (^RCTARKitResolve)(id result);
@@ -22,16 +24,19 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 
 + (instancetype)sharedInstance;
 + (bool)isInitialized;
+- (instancetype)initWithARViewAndBrowser:(ARSCNView *)arView multipeer:(MultipeerConnectivity *)multipeer;
 - (instancetype)initWithARView:(ARSCNView *)arView;
 
 
 @property (nonatomic, strong) NSMutableArray<id<RCTARKitTouchDelegate>> *touchDelegates;
 @property (nonatomic, strong) NSMutableArray<id<RCTARKitRendererDelegate>> *rendererDelegates;
 @property (nonatomic, strong) NSMutableArray<id<RCTARKitSessionDelegate>> *sessionDelegates;
+@property (nonatomic, strong) NSMutableArray<id<MultipeerConnectivityDelegate>> *multipeerDelegate;
 
 
 #pragma mark - Properties
 @property (nonatomic, strong) ARSCNView *arView;
+@property (nonatomic, strong) MultipeerConnectivity *multipeer;
 @property (nonatomic, strong) RCTARKitNodes *nodeManager;
 
 @property (nonatomic, assign) BOOL debug;
@@ -46,6 +51,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 @property (nonatomic, copy) RCTBubblingEventBlock onPlaneRemoved;
 @property (nonatomic, copy) RCTBubblingEventBlock onPlaneUpdated;
 
+
 @property (nonatomic, copy) RCTBubblingEventBlock onAnchorDetected;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnchorRemoved;
 @property (nonatomic, copy) RCTBubblingEventBlock onAnchorUpdated;
@@ -57,8 +63,20 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 @property (nonatomic, copy) RCTBubblingEventBlock onTrackingState;
 @property (nonatomic, copy) RCTBubblingEventBlock onTapOnPlaneUsingExtent;
 @property (nonatomic, copy) RCTBubblingEventBlock onTapOnPlaneNoExtent;
+
+@property (nonatomic, copy) RCTBubblingEventBlock onRotationGesture;
+@property (nonatomic, copy) RCTBubblingEventBlock onPinchGesture;
+
 @property (nonatomic, copy) RCTBubblingEventBlock onEvent;
 @property (nonatomic, copy) RCTBubblingEventBlock onARKitError;
+
+@property (nonatomic, copy) RCTBubblingEventBlock onPeerConnected;
+@property (nonatomic, copy) RCTBubblingEventBlock onPeerConnecting;
+@property (nonatomic, copy) RCTBubblingEventBlock onPeerDisconnected;
+
+@property (nonatomic, copy) RCTBubblingEventBlock onMultipeerJsonDataReceived;
+
+
 
 
 @property NSMutableDictionary *planes; // plane detected
@@ -70,6 +88,7 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (void)resume;
 - (void)reset;
 - (void)hitTestPlane:(CGPoint)tapPoint types:(ARHitTestResultType)types resolve:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;
+- (void)getCurrentWorldMap:(RCTARKitResolve)resolve reject:(RCTARKitReject)reject;
 - (void)hitTestSceneObjects:(CGPoint)tapPoint resolve:(RCTARKitResolve) resolve reject:(RCTARKitReject)reject;
 - (SCNVector3)projectPoint:(SCNVector3)point;
 - (float)getCameraDistanceToPoint:(SCNVector3)point;
@@ -78,6 +97,8 @@ typedef void (^RCTARKitReject)(NSString *code, NSString *message, NSError *error
 - (void)focusScene;
 - (void)clearScene;
 - (NSDictionary *)readCameraPosition;
+- (void)getArAnchorPosition:(CLLocation *)location landmark:(CLLocation *)landmark anchorName:(NSString *)anchorName;
+
 - (NSDictionary *)readCamera;
 - (NSDictionary* )getCurrentLightEstimation;
 - (NSArray * )getCurrentDetectedFeaturePoints;

@@ -58,6 +58,8 @@ class ARKit extends Component {
       keyBy([
         'onTapOnPlaneUsingExtent',
         'onTapOnPlaneNoExtent',
+        'onRotationGesture',
+        'onPinchGesture',
         'onPlaneDetected',
         'onPlaneRemoved',
         'onPlaneUpdated',
@@ -238,6 +240,8 @@ ARKit.propTypes = {
   onTrackingState: PropTypes.func,
   onTapOnPlaneUsingExtent: PropTypes.func,
   onTapOnPlaneNoExtent: PropTypes.func,
+  onRotationGesture: PropTypes.func,
+  onPinchGesture: PropTypes.func,
   onEvent: PropTypes.func,
   isMounted: PropTypes.func,
   isInitialized: PropTypes.func,
